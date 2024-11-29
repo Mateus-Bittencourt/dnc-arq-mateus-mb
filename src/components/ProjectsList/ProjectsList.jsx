@@ -6,6 +6,9 @@ import "./ProjectsList.css";
 import LikedFillend from "../../assets/like-filled.svg";
 import Like from "../../assets/like.svg";
 
+//Components
+import Button from "../Button/Button";
+
 //Utils
 import { getApiData } from "../../services/apiServices";
 
@@ -15,6 +18,25 @@ import { AppContext } from "../../contexts/AppContext";
 function ProjectsList() {
   const appContext = useContext(AppContext);
   const [projects, setProjects] = useState();
+  const [favProjects, setFavProject] = useState([]);
+
+  const handleSavedProjects = (id) => {
+    setFavProject((prevFavProjects) => {
+      if (prevFavProjects.includes(id)) {
+        const filterArray = prevFavProjects.filter(
+          (projectId) => projectId !== id
+        );
+        sessionStorage.setItem("favProjects", JSON.stringify(filterArray));
+        return prevFavProjects.filter((projectId) => projectId !== id);
+      } else {
+        sessionStorage.setItem(
+          "favProjects",
+          JSON.stringify([...prevFavProjects, id])
+        );
+        return [...prevFavProjects, id];
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +49,11 @@ function ProjectsList() {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const savedFavProjects = JSON.parse(sessionStorage.getItem("favProjects"));
+    if (savedFavProjects) setFavProject(savedFavProjects);
   }, []);
 
   return (
@@ -48,7 +75,16 @@ function ProjectsList() {
               ></div>
               <h3>{project.title}</h3>
               <p>{project.subtitle}</p>
-              <img src={Like} height="20px" alt="" />
+              <Button
+                buttonStyle="unstyled"
+                onClick={() => handleSavedProjects(project.id)}
+              >
+                <img
+                  src={favProjects.includes(project.id) ? LikedFillend : Like}
+                  height="20px"
+                  alt=""
+                />
+              </Button>
             </div>
           ))
         ) : (
