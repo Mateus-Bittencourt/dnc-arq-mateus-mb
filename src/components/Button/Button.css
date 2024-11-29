@@ -10,6 +10,11 @@
   transition: background-color 0.3s ease;
 }
 
+.button.unstyled {
+  background: none;
+  padding: 0;
+}
+
 /* PRIMARY */
 .button.primary {
   background-color: #0C70F2;
